@@ -2,22 +2,18 @@
 
 > Access your Dropbox account from your device.
 
-## Usage
+## Developers
 
-``` bash
-# Install dependencies
-npm install
+### Dropbox settings
 
-# Preview on device
-tns preview
+1. You need to register the application on your Dropbox developer console.
+2. You need to create a file `src/services/dropbox-secrets.json`:
 
-# Build, watch for changes and run the application
-tns run
-
-# Build, watch for changes and debug the application
-tns debug <platform>
-
-# Build for production
-tns build <platform> --env.production
-
+```
+{
+    "clientId": "<CLIENT-ID>",
+    "clientSecret": "<CLIENT-SECRET>",
+    "redirectUri": "<REDIRECT-URI>",
+    "scopes": <SCOPES-ARRAY>
+}
 ```
