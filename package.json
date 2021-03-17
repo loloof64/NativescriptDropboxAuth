@@ -1,6 +1,6 @@
 {
   "name": "dropbox-auth",
-  "main": "main.js",
+  "main": "index.js",
   "version": "1.0.0",
   "description": "Access your Dropbox account from your device.",
   "author": "Laurent Bernabe <laurent.bernabe@gmail.com>",
@@ -10,6 +10,7 @@
     "@nativescript/theme": "^2.3.3",
     "@vue/composition-api": "^1.0.0-rc.5",
     "@vue/devtools": "^5.3.3",
+    "nativescript-oauth2": "^3.0.3",
     "nativescript-socketio": "^3.3.1",
     "nativescript-toasty": "^3.0.0-alpha.2",
     "nativescript-vue": "^2.8.1",

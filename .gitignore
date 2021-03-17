@@ -7,3 +7,5 @@ node_modules
 # NativeScript application
 hooks
 platforms
+
+src/services/dropbox-secrets.json
