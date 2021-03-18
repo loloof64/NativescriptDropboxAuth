@@ -9,7 +9,7 @@
         col="0"
         row="0"
         @touch="login"
-        v-if="isTokenValid"
+        v-if="!isTokenValid"
       />
       <Button
         v-else
@@ -31,6 +31,7 @@ import { ref, computed } from "@vue/composition-api";
 import DropboxAuth from "@/components/dropbox_auth/DropboxAuth";
 const dayjs = require("dayjs");
 const appSettings = require("tns-core-modules/application-settings");
+const httpModule = require("tns-core-modules/http");
 
 export default {
   components: {
@@ -43,15 +44,25 @@ export default {
 
     const isTokenValid = computed(() => {
       const token = appSettings.getString("accessToken");
+      ///////////////////////
+      console.log("token is " + token);
+      ///////////////////////////
       if (!token) return false;
 
       const expirationTime = appSettings.getString("expirationTime");
-      if (! expirationTime) return false;
+      ///////////////////////
+      console.log("expiration time is " + expirationTime);
+      ///////////////////////////
+      if (!expirationTime) return false;
 
       const expirationDate = dayjs(expirationTime);
       const now = dayjs();
 
-      return expirationDate.isAfter(now);
+      const valid = expirationDate.isAfter(now);
+      ///////////////////////
+      console.log("valid is " + valid);
+      ///////////////////////////
+      return valid;
     });
 
     const openWebview = function() {
@@ -66,7 +77,7 @@ export default {
       openWebview();
     };
 
-    const handleTokenReady = function({token, expirationTimeISO}) {
+    const handleTokenReady = function({ token, expirationTimeISO }) {
       appSettings.setString("accessToken", token);
       appSettings.setString("expirationTime", expirationTimeISO);
       closeWebview();
@@ -75,10 +86,27 @@ export default {
     const handleAuthError = function(error) {
       console.error(error);
       closeWebview();
-      alert('Could not connect to Dropbox !');
-    }
+      alert("Could not connect to Dropbox !");
+    };
 
-    const logout = function() {};
+    const logout = function() {
+      const token = appSettings.getString("accessToken");
+      httpModule
+        .request({
+          url: "https://api.dropboxapi.com/2/auth/token/revoke",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(
+          (resp) => {
+            appSettings.remove("accessToken");
+          },
+          (err) => {}
+        );
+    };
 
     return {
       loginMsg,
