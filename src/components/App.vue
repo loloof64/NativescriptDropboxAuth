@@ -32,6 +32,7 @@ import DropboxAuth from "@/components/dropbox_auth/DropboxAuth";
 const dayjs = require("dayjs");
 const appSettings = require("tns-core-modules/application-settings");
 const httpModule = require("tns-core-modules/http");
+const frameModule = require("ui/frame");
 
 export default {
   components: {
@@ -44,24 +45,15 @@ export default {
 
     const isTokenValid = computed(() => {
       const token = appSettings.getString("accessToken");
-      ///////////////////////
-      console.log("token is " + token);
-      ///////////////////////////
       if (!token) return false;
 
       const expirationTime = appSettings.getString("expirationTime");
-      ///////////////////////
-      console.log("expiration time is " + expirationTime);
-      ///////////////////////////
       if (!expirationTime) return false;
 
       const expirationDate = dayjs(expirationTime);
       const now = dayjs();
 
       const valid = expirationDate.isAfter(now);
-      ///////////////////////
-      console.log("valid is " + valid);
-      ///////////////////////////
       return valid;
     });
 
@@ -77,10 +69,15 @@ export default {
       openWebview();
     };
 
+    const forcePageRefresh = function() {
+      frameModule.reloadPage();
+    };
+
     const handleTokenReady = function({ token, expirationTimeISO }) {
       appSettings.setString("accessToken", token);
       appSettings.setString("expirationTime", expirationTimeISO);
       closeWebview();
+      forcePageRefresh();
     };
 
     const handleAuthError = function(error) {
@@ -103,6 +100,7 @@ export default {
         .then(
           (resp) => {
             appSettings.remove("accessToken");
+            forcePageRefresh();
           },
           (err) => {}
         );
