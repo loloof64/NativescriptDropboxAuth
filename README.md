@@ -7,7 +7,7 @@
 ### Dropbox settings
 
 1. You need to register the application on your Dropbox developer console.
-2. You need to create a file `src/services/dropbox-secrets.json`:
+2. You need to create a file `src/components/dropbox_auth/dropbox-secrets.json`:
 
 ```
 {
