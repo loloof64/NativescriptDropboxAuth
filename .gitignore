@@ -8,4 +8,4 @@ node_modules
 hooks
 platforms
 
-src/services/dropbox-secrets.json
+src/components/dropbox_auth/dropbox-secrets.json

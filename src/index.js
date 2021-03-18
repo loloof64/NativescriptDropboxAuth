@@ -2,7 +2,6 @@ import Vue from "nativescript-vue";
 import App from "./components/App.vue";
 import VueDevtools from "nativescript-vue-devtools";
 import VueCompositionAPI from "@vue/composition-api";
-import {configureOAuthProviders} from './services/auth-service';
 
 if (TNS_ENV !== "production") {
   Vue.use(VueDevtools);
@@ -13,8 +12,6 @@ Vue.use(VueCompositionAPI);
 
 // Prints Vue logs when --env.production is *NOT* set while building
 Vue.config.silent = TNS_ENV === "production";
-
-configureOAuthProviders();
 
 new Vue({
   store,

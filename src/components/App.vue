@@ -1,58 +1,70 @@
 <template>
-  <Page
-    navigatingTo="onNavigatingTo" 
-  >
+  <Page>
     <ActionBar title="Dropbox Auth" />
+
     <GridLayout columns="*" rows="*, *">
-      <Button class="message" :text="loginMsg" col="0" row="0" @touch="login" />
       <Button
-        class="message"
+        class="actionButton"
+        :text="loginMsg"
+        col="0"
+        row="0"
+        @touch="login"
+      />
+      <Button
+        class="actionButton"
         :text="logoutMsg"
         col="0"
         row="1"
         @touch="logout"
       />
-      <WebView
-        col="0"
-        row="0"
-        rowSpan="2"
-        v-if="webviewOpen"
-        class="webview"
-        @loadStarted="onNavigatingTo"
-        @loadFinished="onNavigatingTo"
-        :src="dropboxAuthUrl"
-      />
+      <Frame col="0" row="0" rowSpan="2" class="dropboxAuth" v-if="webviewOpen">
+        <DropboxAuth @tokenReady="handleTokenReady" />
+      </Frame>
     </GridLayout>
   </Page>
 </template>
 
 <script>
-import { ref } from "@vue/composition-api";
-import dropboxSecrets from "@/services/dropbox-secrets.json";
+import { ref, computed } from "@vue/composition-api";
+import DropboxAuth from "@/components/dropbox_auth/DropboxAuth";
+const appSettings = require("tns-core-modules/application-settings");
+
 export default {
+  components: {
+    DropboxAuth,
+  },
   setup() {
     const loginMsg = ref("Dropbox auth");
     const logoutMsg = ref("Logout");
     const webviewOpen = ref(false);
 
-    const dropboxAuthUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${dropboxSecrets.clientId}&token_access_type=offline&response_type=code`;
-
     const openWebview = function() {
       webviewOpen.value = true;
     };
 
-    const onNavigatingTo = function(args) {
-      const page = args.object;
-      console.log('Got page: '+page);
+    const closeWebview = function() {
+      webviewOpen.value = false;
     };
 
     const login = function() {
       openWebview();
     };
 
+    const handleTokenReady = function(token) {
+      appSettings.setString("accessToken", token);
+      closeWebview();
+    };
+
     const logout = function() {};
 
-    return { loginMsg, logoutMsg, login, logout, webviewOpen, dropboxAuthUrl, onNavigatingTo };
+    return {
+      loginMsg,
+      logoutMsg,
+      login,
+      logout,
+      webviewOpen,
+      handleTokenReady,
+    };
   },
 };
 </script>
@@ -63,14 +75,14 @@ ActionBar {
   color: #ffffff;
 }
 
-.message {
+.actionButton {
   vertical-align: center;
   text-align: center;
   font-size: 20;
   color: #333333;
 }
 
-.webview {
+.dropboxAuth {
   z-index: 10;
 }
 </style>
