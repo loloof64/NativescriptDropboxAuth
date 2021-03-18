@@ -14,6 +14,9 @@
 
 <script>
 import dropboxSecrets from "./dropbox-secrets.json";
+const dayjs = require("dayjs");
+
+
 export default {
   setup(props, ctx) {
     const dropboxAuthUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${dropboxSecrets.clientId}&response_type=token&redirect_uri=${dropboxSecrets.redirectUri}`;
@@ -31,18 +34,18 @@ export default {
     };
 
     const loadStarted = function(args) {
-      if (args.error) console.error("Error !!! " + args.error);
+      if (args.error) ctx.emit("error", args.error);
       else {
         const currentUrl = args.url;
         if (currentUrl.startsWith(dropboxSecrets.redirectUri)) {
           const values = getValuesFromUrl(currentUrl, "#");
-
-          ///////////////////////////
-          // console.log(values);
-          /////////////////////////////
+          const expirationSeconds = parseInt(values["expires_in"]);
+          const timeProcessingGapSeconds = 30;
+          const expirationDurationSeconds = expirationSeconds - timeProcessingGapSeconds;
+          const expirationTimeISO = dayjs().add(expirationDurationSeconds, 's').format();
 
           const token = values["access_token"];
-          ctx.emit('tokenReady', token);
+          ctx.emit("tokenReady", {token, expirationTimeISO});
         }
       }
     };

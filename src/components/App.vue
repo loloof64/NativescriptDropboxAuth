@@ -9,16 +9,18 @@
         col="0"
         row="0"
         @touch="login"
+        v-if="isTokenValid"
       />
       <Button
+        v-else
         class="actionButton"
         :text="logoutMsg"
         col="0"
-        row="1"
+        row="0"
         @touch="logout"
       />
       <Frame col="0" row="0" rowSpan="2" class="dropboxAuth" v-if="webviewOpen">
-        <DropboxAuth @tokenReady="handleTokenReady" />
+        <DropboxAuth @tokenReady="handleTokenReady" @error="handleAuthError" />
       </Frame>
     </GridLayout>
   </Page>
@@ -27,6 +29,7 @@
 <script>
 import { ref, computed } from "@vue/composition-api";
 import DropboxAuth from "@/components/dropbox_auth/DropboxAuth";
+const dayjs = require("dayjs");
 const appSettings = require("tns-core-modules/application-settings");
 
 export default {
@@ -37,6 +40,19 @@ export default {
     const loginMsg = ref("Dropbox auth");
     const logoutMsg = ref("Logout");
     const webviewOpen = ref(false);
+
+    const isTokenValid = computed(() => {
+      const token = appSettings.getString("accessToken");
+      if (!token) return false;
+
+      const expirationTime = appSettings.getString("expirationTime");
+      if (! expirationTime) return false;
+
+      const expirationDate = dayjs(expirationTime);
+      const now = dayjs();
+
+      return expirationDate.isAfter(now);
+    });
 
     const openWebview = function() {
       webviewOpen.value = true;
@@ -50,10 +66,17 @@ export default {
       openWebview();
     };
 
-    const handleTokenReady = function(token) {
+    const handleTokenReady = function({token, expirationTimeISO}) {
       appSettings.setString("accessToken", token);
+      appSettings.setString("expirationTime", expirationTimeISO);
       closeWebview();
     };
+
+    const handleAuthError = function(error) {
+      console.error(error);
+      closeWebview();
+      alert('Could not connect to Dropbox !');
+    }
 
     const logout = function() {};
 
@@ -64,6 +87,8 @@ export default {
       logout,
       webviewOpen,
       handleTokenReady,
+      handleAuthError,
+      isTokenValid,
     };
   },
 };
