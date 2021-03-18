@@ -80,10 +80,17 @@ export default {
       forcePageRefresh();
     };
 
-    const handleAuthError = function(error) {
-      console.error(error);
+    const handleAuthError = function({type, message}) {
       closeWebview();
-      alert("Could not connect to Dropbox !");
+      if (type === 'cancelation') {
+        alert("Canceled connection.");
+      }
+      else if (message) {
+        alert("Could not connect to Dropbox ! "+message);
+      }
+      else {
+        alert("Could not connect to Dropbox !");
+      }
     };
 
     const logout = function() {

@@ -34,7 +34,7 @@ export default {
     };
 
     const loadStarted = function(args) {
-      if (args.error) ctx.emit("error", args.error);
+      if (args.error) ctx.emit("error", {type: undefined, message: args.error});
       else {
         const currentUrl = args.url;
         if (currentUrl.startsWith(dropboxSecrets.redirectUri)) {
@@ -45,7 +45,12 @@ export default {
           const expirationTimeISO = dayjs().add(expirationDurationSeconds, 's').format();
 
           const token = values["access_token"];
-          ctx.emit("tokenReady", {token, expirationTimeISO});
+          if (token) {
+            ctx.emit("tokenReady", {token, expirationTimeISO});
+          }
+          else {
+            ctx.emit("error", {type: "cancelation", message: undefined});
+          }
         }
       }
     };
