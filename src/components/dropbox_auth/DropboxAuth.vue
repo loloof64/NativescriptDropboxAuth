@@ -46,7 +46,7 @@ export default {
 
           const token = values["access_token"];
           if (token) {
-            ctx.emit("tokenReady", {token, expirationTimeISO});
+            ctx.emit("tokenReady", {newToken: token, expirationTimeISO});
           }
           else {
             ctx.emit("error", {type: "cancelation", message: undefined});

@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { onMounted, ref, reactive, computed } from "@vue/composition-api";
 import DropboxAuth from "@/components/dropbox_auth/DropboxAuth";
 import DropboxRootFiles from "@/components/DropBoxRootFiles";
 const dayjs = require("dayjs");
@@ -39,38 +40,23 @@ export default {
     DropboxAuth,
     DropboxRootFiles,
   },
-  data: function() {
-    return {
-      loginMsg: "Dropbox auth",
-      logoutMsg: "Logout",
-      webviewOpen: false,
-      dropboxItems: [],
-      token: appSettings.getString("accessToken"),
-    };
-  },
-  mounted() {
-    this.loadDropboxItems();
-  },
-  methods: {
-    openWebview: function() {
-      this.webviewOpen = true;
-    },
-    closeWebview: function() {
-      this.webviewOpen = false;
-    },
-    login: function() {
-      this.openWebview();
-    },
-    loadDropboxItems: function() {
-      const token = this.token;
-      if (!token) return;
+  setup() {
+    const loginMsg = "Dropbox auth";
+    const logoutMsg = "Logout";
+    const webviewOpen = ref(false);
+    const dropboxItems = ref(reactive([]));
+    const token = ref(appSettings.getString("accesToken"));
+
+    const loadDropBoxItems = function() {
+      const currentToken = token.value;
+      if (!currentToken) return;
       httpModule
         .request({
           url: "https://api.dropboxapi.com/2/files/list_folder",
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${currentToken}`,
           },
           content: JSON.stringify({
             path: "",
@@ -107,11 +93,12 @@ export default {
                   const firstItemNameLower = fst["name"].toLowerCase();
                   const secondItemNameLower = snd["name"].toLowerCase();
 
-                  if (firstIsFolder !== secondIsFolder) return firstIsFolder ? -1 : 1;
+                  if (firstIsFolder !== secondIsFolder)
+                    return firstIsFolder ? -1 : 1;
                   return firstItemNameLower.localeCompare(secondItemNameLower);
                 });
 
-              this.dropboxItems = items;
+              dropboxItems.value = items;
             } catch (err) {
               console.error(err);
               alert("Failed to get items from your Dropbox root folder !");
@@ -122,16 +109,28 @@ export default {
             alert("Failed to get items from your Dropbox root folder !");
           }
         );
-    },
-    handleTokenReady: function({ token, expirationTimeISO }) {
-      this.token = token;
-      appSettings.setString("accessToken", token);
+    };
+
+    const openWebview = function() {
+      webviewOpen.value = true;
+    };
+    const closeWebview = function() {
+      webviewOpen.value = false;
+    };
+    const login = function() {
+      openWebview();
+    };
+
+    const handleTokenReady = function({ newToken, expirationTimeISO }) {
+      token.value = newToken;
+      appSettings.setString("accessToken", newToken);
       appSettings.setString("expirationTime", expirationTimeISO);
-      this.closeWebview();
-      this.loadDropboxItems();
-    },
-    handleAuthError: function({ type, message }) {
-      this.closeWebview();
+      closeWebview();
+      loadDropBoxItems();
+    };
+
+    const handleAuthError = function({ type, message }) {
+      closeWebview();
       if (type === "cancelation") {
         alert("Canceled connection.");
       } else if (message) {
@@ -139,8 +138,9 @@ export default {
       } else {
         alert("Could not connect to Dropbox !");
       }
-    },
-    logout: function() {
+    };
+
+    const logout = function() {
       const token = appSettings.getString("accessToken");
       httpModule
         .request({
@@ -152,20 +152,19 @@ export default {
         })
         .then(
           (response) => {
-            this.token = null;
-            this.dropboxItems = [];
+            token.value = null;
+            dropboxItems.value = [];
             appSettings.remove("accessToken");
           },
           (err) => {
             console.error(err);
           }
         );
-    },
-  },
-  computed: {
-    tokenValid: function() {
-      const token = this.token;
-      if (!token) return false;
+    };
+
+    const tokenValid = computed(() => {
+      const currentToken = token.value;
+      if (!currentToken) return false;
 
       const expirationTime = appSettings.getString("expirationTime");
       if (!expirationTime) return false;
@@ -175,7 +174,22 @@ export default {
 
       const valid = expirationDate.isAfter(now);
       return valid;
-    },
+    });
+
+    onMounted(() => loadDropBoxItems());
+
+    return {
+      loginMsg,
+      logoutMsg,
+      webviewOpen,
+      dropboxItems,
+      token,
+      login,
+      logout,
+      tokenValid,
+      handleTokenReady,
+      handleAuthError,
+    };
   },
 };
 </script>
