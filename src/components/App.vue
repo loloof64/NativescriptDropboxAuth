@@ -48,6 +48,9 @@ export default {
       token: appSettings.getString("accessToken"),
     };
   },
+  mounted() {
+    this.loadDropboxItems();
+  },
   methods: {
     openWebview: function() {
       this.webviewOpen = true;
