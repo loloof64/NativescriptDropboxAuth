@@ -17,3 +17,12 @@
     "scopes": <SCOPES-ARRAY>
 }
 ```
+
+##  Credits
+
+### Flaticon vectors
+
+Donwloaded some vectors from [FlatIcon](wwww.flaticon.com) :
+
+* folder : https://www.flaticon.com/free-icon/folder_760759
+* file : https://www.flaticon.com/free-icon/google-docs_2965335

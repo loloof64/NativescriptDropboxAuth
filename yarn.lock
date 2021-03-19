@@ -961,6 +961,11 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
+"@sergeymell/nativescript-svg@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@sergeymell/nativescript-svg/-/nativescript-svg-1.0.5.tgz#1385a42cc0f488d771a0a33457f91bf43e00054c"
+  integrity sha512-oIs8hmUWOeZhyQOGmgNB+XKafYMbrnlZzbar+xavKiUvKvR/62+eTR7ZsiTEK0mh6V/JZnsnuw5UAiq3Mh6Ing==
+
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz"

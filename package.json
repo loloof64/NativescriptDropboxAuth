@@ -8,6 +8,7 @@
   "dependencies": {
     "@nativescript/core": "^7.0.3",
     "@nativescript/theme": "^2.3.3",
+    "@sergeymell/nativescript-svg": "^1.0.5",
     "@vue/composition-api": "^1.0.0-rc.5",
     "@vue/devtools": "^5.3.3",
     "dayjs": "^1.10.4",

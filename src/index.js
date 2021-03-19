@@ -9,6 +9,10 @@ if (TNS_ENV !== "production") {
 import store from "./store";
 
 Vue.use(VueCompositionAPI);
+Vue.registerElement(
+  "SVGImage",
+  () => require("@sergeymell/nativescript-svg").SVGImage
+);
 
 // Prints Vue logs when --env.production is *NOT* set while building
 Vue.config.silent = TNS_ENV === "production";
