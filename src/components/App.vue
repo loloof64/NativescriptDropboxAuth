@@ -150,6 +150,7 @@ export default {
         .then(
           (response) => {
             this.token = null;
+            this.dropboxItems = [];
             appSettings.remove("accessToken");
           },
           (err) => {
