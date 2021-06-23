@@ -1,12 +1,12 @@
 {
   "name": "dropbox-auth",
-  "main": "./src/index.js",
+  "main": "index.js",
   "version": "1.0.0",
   "description": "Access your Dropbox account from your device.",
   "author": "Laurent Bernabe <laurent.bernabe@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@nativescript/core": "~8.0.0",
+    "@nativescript/core": "^7.0.3",
     "@nativescript/theme": "^2.3.3",
     "@sergeymell/nativescript-svg": "^1.0.5",
     "@vue/composition-api": "^1.0.0-rc.5",
@@ -21,15 +21,15 @@
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
-    "@nativescript/android": "8.0.0",
-    "@nativescript/types": "~8.0.0",
-    "@nativescript/webpack": "~5.0.0-beta.0",
+    "@nativescript/android": "7.0.1",
+    "@nativescript/types": "^7.0.0",
+    "@nativescript/webpack": "^3.0.4",
     "@types/node": "^14.6.2",
     "babel-loader": "^8.1.0",
     "nativescript-vue-template-compiler": "^2.8.1",
     "nativescript-worker-loader": "~0.12.1",
     "sass": "^1.26.10",
-    "typescript": "~4.0.0",
+    "typescript": "^3.9.7",
     "vue": "^2.6.12",
     "vue-loader": "^15.9.3"
   }
