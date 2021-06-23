@@ -10,6 +10,8 @@ Vue.registerElement(
   () => require("@sergeymell/nativescript-svg").SVGImage
 );
 
+Vue.config.silent = false;
+
 new Vue({
   store,
   render: (h) => h("frame", [h(App)]),

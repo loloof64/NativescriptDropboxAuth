@@ -32,7 +32,7 @@ import { onMounted, ref, reactive, computed } from "@vue/composition-api";
 import DropboxAuth from "@/components/dropbox_auth/DropboxAuth";
 import DropboxRootFiles from "@/components/DropBoxRootFiles";
 const dayjs = require("dayjs");
-import { Http, ApplicationSettings } from '@nativescript/core'
+import { Http, ApplicationSettings } from "@nativescript/core";
 
 export default {
   components: {
@@ -46,81 +46,79 @@ export default {
     const dropboxItems = ref(reactive([]));
     const token = ref(ApplicationSettings.getString("accesToken"));
 
-    const loadDropBoxItems = function() {
+    const loadDropBoxItems = function () {
       const currentToken = token.value;
       if (!currentToken) return;
-      Http
-        .request({
-          url: "https://api.dropboxapi.com/2/files/list_folder",
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${currentToken}`,
-          },
-          content: JSON.stringify({
-            path: "",
-            recursive: false,
-          }),
-        })
-        .then(
-          (response) => {
-            try {
-              const content = response.content;
-              const contentAsJSON = JSON.parse(content);
-              const items = contentAsJSON.entries
-                .filter((item) => {
-                  const isFile = item[".tag"] === "file";
-                  const isFolder = item[".tag"] === "folder";
+      Http.request({
+        url: "https://api.dropboxapi.com/2/files/list_folder",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currentToken}`,
+        },
+        content: JSON.stringify({
+          path: "",
+          recursive: false,
+        }),
+      }).then(
+        (response) => {
+          try {
+            const content = response.content;
+            const contentAsJSON = JSON.parse(content);
+            const items = contentAsJSON.entries
+              .filter((item) => {
+                const isFile = item[".tag"] === "file";
+                const isFolder = item[".tag"] === "folder";
 
-                  const isNotDeleted = isFile || isFolder;
-                  return isNotDeleted;
-                })
-                .map((item) => {
-                  const isFolder = item[".tag"] === "folder";
+                const isNotDeleted = isFile || isFolder;
+                return isNotDeleted;
+              })
+              .map((item) => {
+                const isFolder = item[".tag"] === "folder";
 
-                  const name = item.name;
+                const name = item.name;
 
-                  return {
-                    isFolder,
-                    name,
-                  };
-                })
-                .sort((fst, snd) => {
-                  const firstIsFolder = fst.isFolder;
-                  const secondIsFolder = snd.isFolder;
+                return {
+                  isFolder,
+                  name,
+                };
+              })
+              .sort((fst, snd) => {
+                const firstIsFolder = fst.isFolder;
+                const secondIsFolder = snd.isFolder;
 
-                  const firstItemNameLower = fst["name"].toLowerCase();
-                  const secondItemNameLower = snd["name"].toLowerCase();
+                const firstItemNameLower = fst["name"].toLowerCase();
+                const secondItemNameLower = snd["name"].toLowerCase();
 
-                  if (firstIsFolder !== secondIsFolder)
-                    return firstIsFolder ? -1 : 1;
-                  return firstItemNameLower.localeCompare(secondItemNameLower);
-                });
+                if (firstIsFolder !== secondIsFolder)
+                  return firstIsFolder ? -1 : 1;
+                return firstItemNameLower.localeCompare(secondItemNameLower);
+              });
 
-              dropboxItems.value = items;
-            } catch (err) {
-              console.error(err);
-              alert("Failed to get items from your Dropbox root folder !");
-            }
-          },
-          (err) => {
+            dropboxItems.value = items;
+          } catch (err) {
             console.error(err);
             alert("Failed to get items from your Dropbox root folder !");
           }
-        );
+        },
+        (err) => {
+          console.error(err);
+          alert("Failed to get items from your Dropbox root folder !");
+        }
+      );
     };
 
-    const openWebview = function() {
+    const openWebview = function () {
       webviewOpen.value = true;
     };
-    const closeWebview = function() {
+    const closeWebview = function () {
       webviewOpen.value = false;
     };
-    const login = function() {
+    const login = function () {
       openWebview();
     };
 
-    const handleTokenReady = function({ newToken, expirationTimeISO }) {
+    const handleTokenReady = function ({ newToken, expirationTimeISO }) {
       token.value = newToken;
       ApplicationSettings.setString("accessToken", newToken);
       ApplicationSettings.setString("expirationTime", expirationTimeISO);
@@ -128,7 +126,7 @@ export default {
       loadDropBoxItems();
     };
 
-    const handleAuthError = function({ type, message }) {
+    const handleAuthError = function ({ type, message }) {
       closeWebview();
       if (type === "cancelation") {
         alert("Canceled connection.");
@@ -139,27 +137,23 @@ export default {
       }
     };
 
-    const logout = function() {
-      const token = ApplicationSettings.getString("accessToken");
-      Http
-        .request({
+    async function logout() {
+      const storedToken = ApplicationSettings.getString("accessToken");
+      try {
+        await Http.request({
           url: "https://api.dropboxapi.com/2/auth/token/revoke",
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${storedToken}`,
           },
-        })
-        .then(
-          (response) => {
-            token.value = null;
-            dropboxItems.value = [];
-            ApplicationSettings.remove("accessToken");
-          },
-          (err) => {
-            console.error(err);
-          }
-        );
-    };
+        });
+        token.value = null;
+        dropboxItems.value = [];
+        ApplicationSettings.remove("accessToken");
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
     const tokenValid = computed(() => {
       const currentToken = token.value;
