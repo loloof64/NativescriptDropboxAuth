@@ -7,15 +7,11 @@
   "license": "MIT",
   "dependencies": {
     "@nativescript/core": "~8.0.0",
-    "@nativescript/theme": "^2.3.3",
-    "@sergeymell/nativescript-svg": "^1.0.5",
+    "@nativescript/theme": "^3.0.1",
+    "@sergeymell/nativescript-svg": "^1.1.1",
     "@vue/composition-api": "^1.0.0-rc.5",
-    "@vue/devtools": "^5.3.3",
     "dayjs": "^1.10.4",
-    "nativescript-socketio": "^3.3.1",
-    "nativescript-toasty": "^3.0.0-alpha.2",
-    "nativescript-vue": "^2.8.1",
-    "nativescript-vue-devtools": "^1.4.0",
+    "nativescript-vue": "^2.9.0",
     "vuex": "^3.5.1"
   },
   "devDependencies": {

@@ -32,8 +32,7 @@ import { onMounted, ref, reactive, computed } from "@vue/composition-api";
 import DropboxAuth from "@/components/dropbox_auth/DropboxAuth";
 import DropboxRootFiles from "@/components/DropBoxRootFiles";
 const dayjs = require("dayjs");
-const appSettings = require("tns-core-modules/application-settings");
-const httpModule = require("tns-core-modules/http");
+import { Http, ApplicationSettings } from '@nativescript/core'
 
 export default {
   components: {
@@ -45,12 +44,12 @@ export default {
     const logoutMsg = "Logout";
     const webviewOpen = ref(false);
     const dropboxItems = ref(reactive([]));
-    const token = ref(appSettings.getString("accesToken"));
+    const token = ref(ApplicationSettings.getString("accesToken"));
 
     const loadDropBoxItems = function() {
       const currentToken = token.value;
       if (!currentToken) return;
-      httpModule
+      Http
         .request({
           url: "https://api.dropboxapi.com/2/files/list_folder",
           method: "POST",
@@ -123,8 +122,8 @@ export default {
 
     const handleTokenReady = function({ newToken, expirationTimeISO }) {
       token.value = newToken;
-      appSettings.setString("accessToken", newToken);
-      appSettings.setString("expirationTime", expirationTimeISO);
+      ApplicationSettings.setString("accessToken", newToken);
+      ApplicationSettings.setString("expirationTime", expirationTimeISO);
       closeWebview();
       loadDropBoxItems();
     };
@@ -141,8 +140,8 @@ export default {
     };
 
     const logout = function() {
-      const token = appSettings.getString("accessToken");
-      httpModule
+      const token = ApplicationSettings.getString("accessToken");
+      Http
         .request({
           url: "https://api.dropboxapi.com/2/auth/token/revoke",
           method: "POST",
@@ -154,7 +153,7 @@ export default {
           (response) => {
             token.value = null;
             dropboxItems.value = [];
-            appSettings.remove("accessToken");
+            ApplicationSettings.remove("accessToken");
           },
           (err) => {
             console.error(err);
@@ -166,7 +165,7 @@ export default {
       const currentToken = token.value;
       if (!currentToken) return false;
 
-      const expirationTime = appSettings.getString("expirationTime");
+      const expirationTime = ApplicationSettings.getString("expirationTime");
       if (!expirationTime) return false;
 
       const expirationDate = dayjs(expirationTime);

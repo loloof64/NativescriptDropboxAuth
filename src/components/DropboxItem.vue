@@ -22,8 +22,8 @@ export default {
   },
   setup(props) {
     const imageSrc = props.folder
-      ? "~/assets/vectors/folder.svg"
-      : "~/assets/vectors/file.svg";
+      ? "~/components/vectors/folder.svg"
+      : "~/components/vectors/file.svg";
     return { imageSrc };
   },
 };
